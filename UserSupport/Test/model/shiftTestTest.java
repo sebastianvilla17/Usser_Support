@@ -14,5 +14,16 @@ class shiftTestTest {
 		assertEquals( tmp.getTurnoCodificado(),"A01","this correct");
 		
 	}
+	
+	@Test
+	public void convertirTurnoTest() {
+		
+		Shift prueba = new Shift(1);
+		assertEquals( prueba.convertirTurno(1),"A01","this correct");
+		assertEquals( prueba.convertirTurno(2520),"Z20","this correct");
+		assertEquals( prueba.convertirTurno(525),"F25","this correct");
+		assertEquals( prueba.convertirTurno(3500),"J00","this correct");
+	}
+	
 
 }

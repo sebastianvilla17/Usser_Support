@@ -91,7 +91,7 @@ public class ShiftSystem {
 		*whit the user information or message in which the information
 		* was not found
 		*/
-		public String searchDocument(String documentNumber){
+		public String searchDocument(String documentNumber)throws noFoundException {
 			
 			String search="";
 			for (int i = 0; i<listaUsuarios.size(); i++){
@@ -100,6 +100,11 @@ public class ShiftSystem {
 				if (usuarioTemporal.getDocumenNumber().equals (documentNumber) ){
 					Shift turn=(Shift)listaUsuarios.get(i)[1];
 					search=  usuarioTemporal.toString()+" "+ turn.getTurnoCodificado() ;
+				}
+				
+				else {
+					
+					throw new noFoundException(documentNumber);
 				}
 			}
 			return search;
@@ -150,7 +155,7 @@ public class ShiftSystem {
 			return info;
 		}
 		
-		/** blankLine
+		/** attendShift
 		*<p> desc:</p> This method is responsible for modifying the attributes
 		* of the shift depending on whether the user is or not and if 
 		* it has been attended
@@ -184,7 +189,7 @@ public class ShiftSystem {
 					}
 				}
 				else {
-					status="user not found";
+					status= "This user does not have an assigned shift or is not registered";
 				}
 			}
 			

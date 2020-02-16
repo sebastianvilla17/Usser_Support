@@ -159,9 +159,16 @@ public class Main {
 		
 							System.out.println("enter the document Number of the user");
 							documentNumber= reader.nextLine().toLowerCase();
-		
+							
+							try {
 							info= users.searchDocument(documentNumber);
 							System.out.println(info);
+							}
+							
+							catch(noFoundException e){
+								
+								System.out.println(e.getMessage());
+							}
 							break;
 					}
 					
@@ -170,7 +177,13 @@ public class Main {
 				case 2:
 					System.out.println("enter the patient's document number");
 					find= reader.nextLine().toLowerCase();
+					try {
 					info= users.searchDocument(find);
+					}
+					catch(noFoundException s) {
+						info=s.getMessage();
+						System.out.println(info);
+					}
 					System.out.println(info);
 					System.out.println("///////////////");
 					System.out.println("is the user?\n"+"yes, enter 'Y'\n"+ "no enter 'N'");	
