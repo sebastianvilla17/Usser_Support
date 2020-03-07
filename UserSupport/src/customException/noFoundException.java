@@ -14,7 +14,7 @@ public class noFoundException extends Exception{
 		* at home if the exception is met.
 		*/
 		public noFoundException(String id) {
-			super("the user " +id+ " is registered");
+			super("the user " +id+ " is not registered");
 			
 		}
 		
