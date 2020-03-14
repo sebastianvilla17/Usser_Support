@@ -1,5 +1,10 @@
 package model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import customException.*;
@@ -13,6 +18,8 @@ public class ShiftSystem {
 	ArrayList<Shift> shiftList = new ArrayList<Shift>();
 	DateAndTime fecha = DateAndTime.ObtenerDateAndTimeUnico();
 	ShiftType type;
+	private static final String ARCHIVO_NOMBRE = "data" + File.separator + "nombre.txt";
+	private static final String ARCHIVO_APELLIDO = "data" + File.separator + "apellido.txt";
 
 	public ShiftSystem(String nameOfDepartament) {
 		this.nameOfDepartament = nameOfDepartament;
@@ -52,8 +59,7 @@ public class ShiftSystem {
 		return info;
 	}
 
-	public String addShift(String documentNumber, String shiftName, int hora, int minuto, int segundo, int horaFin,
-			int minutoFin, int segundoFin) {
+	public String addShift(String documentNumber, String shiftName, int horaFin, int minutoFin, int segundoFin) {
 
 		int posicion = 0;
 		for (int i = 0; i < userList.size(); i++) {
@@ -63,7 +69,7 @@ public class ShiftSystem {
 				posicion = i;
 			}
 		}
-		
+
 		LocalTime start = fecha.mantenerFecha();
 		LocalTime end = fecha.formatearHora(horaFin, minutoFin, segundoFin);
 
@@ -76,16 +82,94 @@ public class ShiftSystem {
 		return info;
 	}
 
-	/*public String creation(String documentType, String documentNumber, String name, String lastName, String phone,
-			String adress, String shiftName, int hora, int minuto, int segundo, int horaFin, int minutoFin,
-			int segundoFin) {
+	public boolean discontinued(String document) {
 
-		String user = addUser(documentType, documentNumber, name, lastName, phone, adress);
+		boolean penalized = false;
+		int conter = 0;
+		for (int i = 0; i < userList.size(); i++) {
+			User usuarioTemporal = userList.get(i);
+			if (usuarioTemporal.getDocumenNumber().equals(document)) {
+				for (int j = 0; j < shiftList.size(); j++) {
+					Shift tmp = shiftList.get(j);
+					if (tmp.getPosicion() == i) {
+						if (tmp.getComent() == 'O') {
+							conter++;
+							if (conter >= 2) {
+								usuarioTemporal.setDiscontinued(true);
+								penalized = true;
+							}
+						}
+					}
 
-		String shift = addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
+				}
+			} else {
+				penalized = false;
+			}
 
-		return user + shift;
-	}*/
+		}
+		if (penalized == false) {
+			penalized = false;
+		}
+		return penalized;
+
+	}
+
+	public String genrateUsers(int cant) throws IOException {
+		String informe = "";
+		int conter = 0;
+		BufferedReader br = new BufferedReader(new FileReader(ARCHIVO_NOMBRE));
+		BufferedReader bx = new BufferedReader(new FileReader(ARCHIVO_APELLIDO));
+		while (conter < cant) {
+
+			String name = br.readLine();
+			String lastName = bx.readLine();
+			String documentType = "cedula";
+			String phone = String.valueOf(Math.floor(Math.random() * (1000000 - 9999999 + 1) + 9999999));
+			String documentNumber = String.valueOf(Math.floor(Math.random() * (1000000 - 99999999 + 1) + 99999999));
+			String adress = "carrera" + String.valueOf(Math.floor(Math.random() * (1 - 200 + 1) + 200));
+
+			informe += addUser(documentType, documentNumber, name, lastName, phone, adress) + "\n";
+			conter++;
+
+		}
+		br.close();
+		bx.close();
+
+		return informe;
+	}
+
+	public String generateShifts(int day, int cant) {
+		String informe="";
+		String inforTotal="";
+		int conter=0;
+		String docNum="";
+		int num=0;
+		int dayge=1;
+		while(num<day) {
+			
+		while(conter<cant) {
+		int tamnio= userList.size();
+		int userPos =  (int)(Math.floor(Math.random() * (0 - tamnio + 1) + tamnio));
+		for(int i=0; i<userList.size(); i++) {
+			if(i==userPos) {
+				 docNum= userList.get(i).getDocumenNumber();
+			}
+		}
+		
+		String shiftName= "sacar turno";
+		int horaFin=  (int)(Math.floor(Math.random() * (1 - 24 + 1) + 24));
+		int minutoFin =  (int)(Math.floor(Math.random() * (0 - 60 + 1) + 60));
+		int segundoFin=  (int)(Math.floor(Math.random() * (0 - 60 + 1) + 60));
+		
+		informe+= addShift( docNum,  shiftName,  horaFin,  minutoFin,  segundoFin) + "\n";
+		conter++;
+	}
+		inforTotal+="Day: "+ dayge +"\n"+ "  "+ informe+ "\n";
+		num++;
+		dayge++;
+		}
+		return inforTotal;
+	}
 
 	/**
 	 * repeated
@@ -113,11 +197,10 @@ public class ShiftSystem {
 			if (usuarioTemporal.getDocumenNumber().equals(document)) {
 
 				throw new RepeatedUserException(document);
-			} else {
-
-				message = "the user is not listed";
 			}
-
+		}
+		if (message.equals("")) {
+			message = "the user is not listed";
 		}
 
 		return message;
@@ -137,41 +220,39 @@ public class ShiftSystem {
 	 * @return This method returns the message a message whit the user information
 	 *         or message in which the information was not found
 	 */
-	
-	public String searchDocument(String documentNumber, String shiftName, int hora, int minuto, int segundo,
-			int horaFin, int minutoFin, int segundoFin) throws noFoundException {
 
-		String encontrado="";
-		
-		for(int i=0; i<userList.size(); i++) {
-			
-			String tmp= userList.get(i).getDocumenNumber();
-			if(tmp.equals(documentNumber)) {
-				encontrado= userList.get(i).toString()+" "+ addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
-			}
-		}
-		if(encontrado.equals("")) {
-			throw new noFoundException(documentNumber);
-			}
-		
-		
-		return encontrado;
-		
-		/*String search = "";
+	public String searchDocument(String documentNumber, String shiftName, int horaFin, int minutoFin, int segundoFin)
+			throws noFoundException {
+
+		String encontrado = "";
+
 		for (int i = 0; i < userList.size(); i++) {
 
-			User usuarioTemporal = userList.get(i);
-			if (usuarioTemporal.getDocumenNumber().equals(documentNumber)) {
-
-				search = usuarioTemporal.toString() + " " + addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
-			}
-
-			else {
-
-				throw new noFoundException(documentNumber);
+			String tmp = userList.get(i).getDocumenNumber();
+			if (tmp.equals(documentNumber)) {
+				encontrado = userList.get(i).toString() + " "
+						+ addShift(documentNumber, shiftName, horaFin, minutoFin, segundoFin);
 			}
 		}
-		return search;*/
+		if (encontrado.equals("")) {
+			throw new noFoundException(documentNumber);
+		}
+
+		return encontrado;
+
+		/*
+		 * String search = ""; for (int i = 0; i < userList.size(); i++) {
+		 * 
+		 * User usuarioTemporal = userList.get(i); if
+		 * (usuarioTemporal.getDocumenNumber().equals(documentNumber)) {
+		 * 
+		 * search = usuarioTemporal.toString() + " " + addShift(documentNumber,
+		 * shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin); }
+		 * 
+		 * else {
+		 * 
+		 * throw new noFoundException(documentNumber); } } return search;
+		 */
 	}
 
 	/**

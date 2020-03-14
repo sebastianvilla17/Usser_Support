@@ -24,7 +24,7 @@ class shiftSystemTest {
 		
 		setup1();
 		
-		assertEquals( tmp.addUser("cedula","66850347","marina","avila","3207650367","la sirena"),"marina  avila  turno: A01","this correct");
+		assertEquals( tmp.addUser("cedula","66850347","marina","avila","3207650367","la sirena"),"marina  avila","this correct");
 		
 	}
 	
@@ -56,7 +56,7 @@ class shiftSystemTest {
 			User user= new User("cedula","66850347","marina","avila","3207650367","la sirena");
 			setup1();
 			try {
-			assertEquals( tmp.searchDocument(user.getDocumenNumber()),"Name : marina avila//Phone: 3207650367 A00","this correct");
+			assertEquals( tmp.searchDocument(user.getDocumenNumber(),"cancelar cita", 12,24,15),"Name : marina avila//Phone: 3207650367 A00  inicio 14:40:34.485///  fin 12:24:15.485","this correct");
 			}
 			catch(noFoundException s) {
 				
@@ -64,7 +64,7 @@ class shiftSystemTest {
 			}
 			
 			try {
-				assertEquals( tmp.searchDocument("1193269834"),"the user 1193269834 is registered","this correct");
+				assertEquals( tmp.searchDocument("1193269834","sacar cita", 14, 25,35),"the user 1193269834 is registered","this correct");
 				}
 				catch(noFoundException s) {
 					
@@ -102,6 +102,11 @@ class shiftSystemTest {
 		}
 	
 		@Test
+		public void discontinued() {
+			assertEquals( tmp.discontinued("1193269834"),"the user is not penalized","this correct");
+		}
+		
+		
 		public void attendShiftTest () {
 			
 			

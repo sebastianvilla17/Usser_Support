@@ -1,8 +1,12 @@
 package ui;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Scanner;
+
+import javax.imageio.IIOException;
+
 import model.ShiftSystem;
 import customException.*;
 import model.DateAndTime;
@@ -55,10 +59,28 @@ public class Main {
 		boolean valid = false;
 		users = new ShiftSystem("users");
 		reader = new Scanner(System.in);
-		date= DateAndTime.ObtenerDateAndTimeUnico();
-		String result;
+		date = DateAndTime.ObtenerDateAndTimeUnico();
 		init();
 
+			System.out.println("ingrese la cantidad");
+			int cantidad=Integer.parseInt(reader.nextLine());
+			
+			try {
+			String result= users.genrateUsers(cantidad);
+			System.out.println(result);
+			}catch(IOException x) {
+				
+			}
+			
+			System.out.println("ingrese la cantidad");
+			int turn=Integer.parseInt(reader.nextLine());
+			
+			System.out.println("ingrese los dias");
+			int day=Integer.parseInt(reader.nextLine());
+			
+			String total= users.generateShifts(day, turn);
+			System.out.println(total);
+			
 		do {
 			System.out.println("choose the desired option\n" + "1 format the time\n" + "2 handle the system");
 			try {
@@ -74,27 +96,27 @@ public class Main {
 			do {
 				System.out.println("enter the year");
 				anioA = Integer.parseInt(reader.nextLine());
-			}while(anioA<2020);
+			} while (anioA < 2020);
 			do {
-			System.out.println("enter the month");
-			mesA = Integer.parseInt(reader.nextLine());
-			}while(mesA>12);
+				System.out.println("enter the month");
+				mesA = Integer.parseInt(reader.nextLine());
+			} while (mesA > 12);
 			do {
-			System.out.println("enter the day");
-			diaA = Integer.parseInt(reader.nextLine());
-			}while(diaA>31);
+				System.out.println("enter the day");
+				diaA = Integer.parseInt(reader.nextLine());
+			} while (diaA > 31);
 			do {
-			System.out.println("enter the hour");
-			horaA = Integer.parseInt(reader.nextLine());
-			}while(horaA>24);
+				System.out.println("enter the hour");
+				horaA = Integer.parseInt(reader.nextLine());
+			} while (horaA > 24);
 			do {
-			System.out.println("enter the minute");
-			minutoA = Integer.parseInt(reader.nextLine());
-			}while(minutoA>59);
+				System.out.println("enter the minute");
+				minutoA = Integer.parseInt(reader.nextLine());
+			} while (minutoA > 59);
 			do {
-			System.out.println("enter the second");
-			segundoA = Integer.parseInt(reader.nextLine());
-			}while(segundoA>59);
+				System.out.println("enter the second");
+				segundoA = Integer.parseInt(reader.nextLine());
+			} while (segundoA > 59);
 
 			LocalDate fecha = date.formatearFecha(anioA, mesA, diaA);
 			LocalTime hora = date.formatearHora(horaA, minutoA, segundoA);
@@ -105,13 +127,15 @@ public class Main {
 			System.out.println("Date: " + date.fecha());
 			System.out.println("Time: " + date.hora());
 		}
+
 		do {
 			System.out.println("/////////////////////////////////////");
-			System.out.println("System time: "+date.mantenerFecha());
+			System.out.println("System time: " + date.mantenerFecha());
 			try {
 				System.out.println("Welcome to the shifts attention system for the user");
 				System.out.println("///////////////////////////////////////////////////");
-				System.out.println("1 register shift or\n" + "2 attend shift\n" + "3 reports");
+				System.out.println("1 register shift or\n" + "2 attend shift\n" + "3 reports \n"
+						+ "4 show date and time\n" + "5 suspend user");
 				option = Integer.parseInt(reader.nextLine());
 
 			} catch (NumberFormatException x) {
@@ -214,8 +238,7 @@ public class Main {
 						segundoFin = Integer.parseInt(reader.nextLine());
 
 						creation = users.addUser(documentType, documentNumber, name, lastName, phone, adress);
-						shiftCr = users.addShift(documentNumber, shiftName, horaA, minutoA, segundoA, horaFin,
-								minutoFin, segundoFin);
+						shiftCr = users.addShift(documentNumber, shiftName, horaFin, minutoFin, segundoFin);
 
 						System.out.println(creation);
 						System.out.println(shiftCr);
@@ -240,8 +263,7 @@ public class Main {
 
 					try {
 
-						info = users.searchDocument(documentNumber, shiftName, horaA, minutoA, segundoA, horaFin,
-								minutoFin, segundoFin);
+						info = users.searchDocument(documentNumber, shiftName, horaFin, minutoFin, segundoFin);
 						System.out.println(info);
 					}
 
@@ -270,8 +292,28 @@ public class Main {
 
 				System.out.println("enter the document Number of the user");
 				documentNumber = reader.nextLine().toLowerCase();
-				info = users.report(documentNumber);
-				System.out.println(info);
+				if (users.discontinued(documentNumber) == true) {
+					System.out.println("suspended user");
+				} 
+				else {
+					info = users.report(documentNumber);
+					System.out.println(info);
+				}
+				break;
+
+			case 4:
+				System.out.println("hora:  " + date.mantenerFecha());
+				System.out.println("fecha:  " + date.fechaActual());
+				break;
+
+			case 5:
+				System.out.println("enter the document number of the person you want to suspend");
+				documentNumber = reader.nextLine().toLowerCase();
+			     if( users.discontinued(documentNumber)==true) {
+			    	 System.out.println("suspended user");
+			     }else {
+				System.out.println("the user is not suspended");
+			     }
 				break;
 			}
 

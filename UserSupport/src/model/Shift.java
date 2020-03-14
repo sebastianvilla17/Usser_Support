@@ -29,7 +29,7 @@ public class Shift {
 		this.idTurno = turno;
 		this.turnoCodificado = convertirTurno(turno);
 		this.status = 'N';
-		this.coment = 'U';
+		this.coment = 'O';
 
 		this.type = new ShiftType(shiftName, startTime, endTime);
 
