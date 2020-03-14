@@ -1,5 +1,7 @@
 package ui;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Scanner;
 import model.ShiftSystem;
 import customException.*;
@@ -26,10 +28,10 @@ public class Main {
 
 		int anioA;
 		int mesA;
-		int diaA;
-		int horaA;
-		int minutoA;
-		int segundoA;
+		int diaA = 0;
+		int horaA = 0;
+		int minutoA = 0;
+		int segundoA = 0;
 		int horaFin;
 		int minutoFin;
 		int segundoFin;
@@ -48,48 +50,68 @@ public class Main {
 		int menu = 0;
 		String find = "";
 		String repeat = "";
+		String shiftCr = "";
 		char answer;
 		boolean valid = false;
 		users = new ShiftSystem("users");
 		reader = new Scanner(System.in);
-		date = new DateAndTime();
+		date= DateAndTime.ObtenerDateAndTimeUnico();
 		String result;
 		init();
-      do {
-		System.out.println("choose the desired option\n" + "1 you want to format the time\n" + "2 handle the system");
-		option = Integer.parseInt(reader.nextLine());
+
+		do {
+			System.out.println("choose the desired option\n" + "1 format the time\n" + "2 handle the system");
+			try {
+				option = Integer.parseInt(reader.nextLine());
+				valid = true;
+			} catch (NumberFormatException n) {
+				System.out.println("the data entered is not valid");
+				valid = false;
+			}
+		} while (valid == false);
+
 		if (option == 1) {
-			System.out.println("enter the year");
-			anioA = Integer.parseInt(reader.nextLine());
+			do {
+				System.out.println("enter the year");
+				anioA = Integer.parseInt(reader.nextLine());
+			}while(anioA<2020);
+			do {
 			System.out.println("enter the month");
 			mesA = Integer.parseInt(reader.nextLine());
+			}while(mesA>12);
+			do {
 			System.out.println("enter the day");
 			diaA = Integer.parseInt(reader.nextLine());
+			}while(diaA>31);
+			do {
 			System.out.println("enter the hour");
 			horaA = Integer.parseInt(reader.nextLine());
+			}while(horaA>24);
+			do {
 			System.out.println("enter the minute");
 			minutoA = Integer.parseInt(reader.nextLine());
+			}while(minutoA>59);
+			do {
 			System.out.println("enter the second");
 			segundoA = Integer.parseInt(reader.nextLine());
-			result = date.DateAndTIME(anioA, mesA, diaA, horaA, minutoA, segundoA);
-			System.out.println(result);
-			
+			}while(segundoA>59);
+
+			LocalDate fecha = date.formatearFecha(anioA, mesA, diaA);
+			LocalTime hora = date.formatearHora(horaA, minutoA, segundoA);
+
+			System.out.println("Date: " + fecha + "\n" + "Time: " + hora);
+
 		} else {
-			anioA = date.getAnio();
-			mesA = date.getMes();
-			diaA = date.getDia();
-			horaA = date.getHora();
-			minutoA = date.getMinuto();
-			segundoA = date.getSegundo();
-			result = "fecha actual:" + anioA + "/" + mesA + "/" + diaA + "///" + "hora actual: " + date.darHora();
-			System.out.println(result);
+			System.out.println("Date: " + date.fecha());
+			System.out.println("Time: " + date.hora());
 		}
-		
-		
+		do {
+			System.out.println("/////////////////////////////////////");
+			System.out.println("System time: "+date.mantenerFecha());
 			try {
 				System.out.println("Welcome to the shifts attention system for the user");
 				System.out.println("///////////////////////////////////////////////////");
-				System.out.println("1 register shift or\n" + "2 attend shift");
+				System.out.println("1 register shift or\n" + "2 attend shift\n" + "3 reports");
 				option = Integer.parseInt(reader.nextLine());
 
 			} catch (NumberFormatException x) {
@@ -191,9 +213,12 @@ public class Main {
 						System.out.println("enter the second at which the turn ends");
 						segundoFin = Integer.parseInt(reader.nextLine());
 
-						creation = users.creation(documentType, documentNumber, name, lastName, phone, adress,
-								shiftName, horaA, minutoA, segundoA, horaFin, minutoFin, segundoFin);
+						creation = users.addUser(documentType, documentNumber, name, lastName, phone, adress);
+						shiftCr = users.addShift(documentNumber, shiftName, horaA, minutoA, segundoA, horaFin,
+								minutoFin, segundoFin);
+
 						System.out.println(creation);
+						System.out.println(shiftCr);
 					}
 
 					break;
@@ -202,6 +227,7 @@ public class Main {
 
 					System.out.println("enter the document Number of the user");
 					documentNumber = reader.nextLine().toLowerCase();
+
 					System.out.println("enter the name of the shift");
 					shiftName = reader.nextLine().toLowerCase();
 
@@ -213,6 +239,7 @@ public class Main {
 					segundoFin = Integer.parseInt(reader.nextLine());
 
 					try {
+
 						info = users.searchDocument(documentNumber, shiftName, horaA, minutoA, segundoA, horaFin,
 								minutoFin, segundoFin);
 						System.out.println(info);
@@ -237,6 +264,15 @@ public class Main {
 				 * answer = reader.nextLine().toUpperCase().charAt(0); creation =
 				 * users.attendShift(find, answer); System.out.println(creation); break;
 				 */
+				break;
+
+			case 3:
+
+				System.out.println("enter the document Number of the user");
+				documentNumber = reader.nextLine().toLowerCase();
+				info = users.report(documentNumber);
+				System.out.println(info);
+				break;
 			}
 
 			System.out.println("you want to return to the menu \n" + "1 yes\n" + "2 no");

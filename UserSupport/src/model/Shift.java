@@ -1,6 +1,9 @@
 package model;
 
 import model.User;
+
+import java.time.LocalTime;
+
 import model.DateAndTime;
 
 public class Shift {
@@ -13,14 +16,14 @@ public class Shift {
 	private double horaI;
 	private double horaF;
 	private ShiftType type;
-	private String startTime;
-	private String endTime;
+	private LocalTime startTime;
+	private LocalTime endTime;
 	public final static char ATTENDED = 'A';
 	public final static char NO_ATTENDED = 'N';
 	public final static char NO_USER = 'O';
 	public final static char USER = 'U';
 
-	public Shift(int posicionUser, int turno, String shiftName, String startTime, String endTime) {
+	public Shift(int posicionUser, int turno, String shiftName, LocalTime startTime, LocalTime endTime) {
 
 		this.posicionUser = posicionUser;
 		this.idTurno = turno;
@@ -142,7 +145,7 @@ public class Shift {
 	}
 
 	public String toString() {
-		return "codigo: "+ turnoCodificado + "estaba el usuario: " + coment + "se atendio: "+ status;
-				
+		return "codigo: " + turnoCodificado + " estaba el usuario: " + coment + "se atendio: " + status;
+
 	}
 }

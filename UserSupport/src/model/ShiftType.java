@@ -1,12 +1,14 @@
 package model;
 
+import java.time.LocalTime;
+
 public class ShiftType {
 	
 	private String name="";
-	private String inicio;
-	private String fin;
+	private LocalTime inicio;
+	private LocalTime fin;
 	
-	public ShiftType(String name, String inicio, String fin) {
+	public ShiftType(String name, LocalTime inicio, LocalTime fin) {
 		this.name = name;
 		this.inicio = inicio;
 		this.fin = fin;
@@ -16,11 +18,11 @@ public class ShiftType {
 		return name;
 	}
 
-	public String getInicio() {
+	public LocalTime getInicio() {
 		return inicio;
 	}
 
-	public String getFin() {
+	public LocalTime getFin() {
 		return fin;
 	}
 

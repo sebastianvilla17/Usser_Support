@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import customException.*;
 import model.DateAndTime;
@@ -10,12 +11,12 @@ public class ShiftSystem {
 	private String nameOfDepartament = "";
 	ArrayList<User> userList = new ArrayList<User>();
 	ArrayList<Shift> shiftList = new ArrayList<Shift>();
-	DateAndTime fecha = new DateAndTime();
+	DateAndTime fecha = DateAndTime.ObtenerDateAndTimeUnico();
 	ShiftType type;
 
 	public ShiftSystem(String nameOfDepartament) {
 		this.nameOfDepartament = nameOfDepartament;
-		
+
 	}
 
 	/**
@@ -51,22 +52,9 @@ public class ShiftSystem {
 		return info;
 	}
 
-	public String addShift(int posicion, String shiftName,int hora, int minuto, int segundo, int horaFin, int minutoFin, int segundoFin) {
+	public String addShift(String documentNumber, String shiftName, int hora, int minuto, int segundo, int horaFin,
+			int minutoFin, int segundoFin) {
 
-		String start= fecha.formattedTime(hora, minuto, segundo);
-		String end= fecha.formattedTime(horaFin,  minutoFin,  segundoFin);
-		
-		int idTurnoTemp = shiftList.size();
-
-		Shift turno = new Shift(posicion, idTurnoTemp, shiftName,start, end);
-		shiftList.add(turno);
-		
-		String info=turno.getTurnoCodificado()+ "  inicio "+ start +"///"+ "  fin "+end;
-		return info;
-	}
-
-	public String creation(String documentType, String documentNumber, String name, String lastName, String phone,
-			String adress,String shiftName,int hora, int minuto, int segundo, int horaFin, int minutoFin, int segundoFin) {
 		int posicion = 0;
 		for (int i = 0; i < userList.size(); i++) {
 
@@ -75,14 +63,29 @@ public class ShiftSystem {
 				posicion = i;
 			}
 		}
-		String shift = addShift(posicion, shiftName, hora,  minuto,  segundo,  horaFin,  minutoFin,  segundoFin);
+		
+		LocalTime start = fecha.mantenerFecha();
+		LocalTime end = fecha.formatearHora(horaFin, minutoFin, segundoFin);
+
+		int idTurnoTemp = shiftList.size();
+
+		Shift turno = new Shift(posicion, idTurnoTemp, shiftName, start, end);
+		shiftList.add(turno);
+
+		String info = turno.getTurnoCodificado() + "  inicio " + start + "///" + "  fin " + end;
+		return info;
+	}
+
+	/*public String creation(String documentType, String documentNumber, String name, String lastName, String phone,
+			String adress, String shiftName, int hora, int minuto, int segundo, int horaFin, int minutoFin,
+			int segundoFin) {
+
 		String user = addUser(documentType, documentNumber, name, lastName, phone, adress);
 
-		return user + shift;
-	}
-	
-	
+		String shift = addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
 
+		return user + shift;
+	}*/
 
 	/**
 	 * repeated
@@ -134,15 +137,33 @@ public class ShiftSystem {
 	 * @return This method returns the message a message whit the user information
 	 *         or message in which the information was not found
 	 */
-	public String searchDocument(String documentNumber,String shiftName,int hora, int minuto, int segundo, int horaFin, int minutoFin, int segundoFin) throws noFoundException {
+	
+	public String searchDocument(String documentNumber, String shiftName, int hora, int minuto, int segundo,
+			int horaFin, int minutoFin, int segundoFin) throws noFoundException {
 
-		String search = "";
+		String encontrado="";
+		
+		for(int i=0; i<userList.size(); i++) {
+			
+			String tmp= userList.get(i).getDocumenNumber();
+			if(tmp.equals(documentNumber)) {
+				encontrado= userList.get(i).toString()+" "+ addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
+			}
+		}
+		if(encontrado.equals("")) {
+			throw new noFoundException(documentNumber);
+			}
+		
+		
+		return encontrado;
+		
+		/*String search = "";
 		for (int i = 0; i < userList.size(); i++) {
 
-			User usuarioTemporal = (User) userList.get(i);
+			User usuarioTemporal = userList.get(i);
 			if (usuarioTemporal.getDocumenNumber().equals(documentNumber)) {
 
-				search = usuarioTemporal.toString() + " " + addShift(i,shiftName, hora,  minuto,  segundo,  horaFin,  minutoFin,  segundoFin);
+				search = usuarioTemporal.toString() + " " + addShift(documentNumber, shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin);
 			}
 
 			else {
@@ -150,7 +171,7 @@ public class ShiftSystem {
 				throw new noFoundException(documentNumber);
 			}
 		}
-		return search;
+		return search;*/
 	}
 
 	/**
@@ -245,8 +266,9 @@ public class ShiftSystem {
 							shiftList.get(j).setStatus('A');
 							status = "the turn was attended";
 						}
+					} else {
+						status = "This user does not have an assigned shift";
 					}
-					else {status="This user does not have an assigned shift";}
 				}
 			} else {
 				status = "This user does not registered";
@@ -256,21 +278,23 @@ public class ShiftSystem {
 
 		return status;
 	}
-	
-	public String report (String document) {
-		String report="";
-		for (int i=1; i<userList.size(); i++) {
-			String user= userList.get(i).getDocumenNumber();
-			if(user.equals(document)) {
-				for(int j=1; j<shiftList.size();j++) {
-					if(shiftList.get(j).getPosicion()== i) {
-						report+= shiftList.get(j).toString()+ "\n";
+
+	public String report(String document) {
+		String report = "";
+		for (int i = 0; i < userList.size(); i++) {
+			User usuarioTemporal = (User) userList.get(i);
+			if (usuarioTemporal.getDocumenNumber().equals(document)) {
+				for (int j = 0; j < shiftList.size(); j++) {
+					if (shiftList.get(j).getPosicion() == i) {
+						report += shiftList.get(j).toString() + "\n";
 					}
 				}
+				report = "no tiene turno";
+				break;
 			}
-			report= "no tiene turno";
+			report = "no tiene turno";
 		}
-		
+
 		return report;
 	}
 

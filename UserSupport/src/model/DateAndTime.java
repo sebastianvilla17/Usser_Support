@@ -1,137 +1,87 @@
 package model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 
 public class DateAndTime {
 
-	Calendar fecha = Calendar.getInstance();
+	public static DateAndTime dateAndTimeUnico = new DateAndTime(); 
+	private LocalDate actualizaFecha;
+	private LocalTime actualiza;
+	private int horaF;
+	private int minutoF;
+	private int segundoF ;
+	
+	private DateAndTime() {
 
-	int anio;
-	int mes;
-	int dia;
-	int hora;
-	int minuto;
-	int segundo;
-
-	public DateAndTime() {
-		anio = fecha.get(Calendar.YEAR);
-		mes = fecha.get(Calendar.MONTH) + 1;
-		dia = fecha.get(Calendar.DAY_OF_MONTH);
-
-		hora = fecha.get(Calendar.HOUR_OF_DAY);
-		minuto = fecha.get(Calendar.MINUTE);
-		segundo = fecha.get(Calendar.SECOND);
 	}
 
-	public String darHora() {
-		hora = fecha.get(Calendar.HOUR_OF_DAY);
-		minuto = fecha.get(Calendar.MINUTE);
-		segundo = fecha.get(Calendar.SECOND);
+	public static DateAndTime ObtenerDateAndTimeUnico()
+	{
+		return dateAndTimeUnico; 
+	}
 		
-		return hora + " " + minuto + " " + segundo;
+
+
+	public LocalDate fecha() {
+		LocalDate date = LocalDate.now();
+		return date;
+	}
+
+	public LocalTime hora() {
+		LocalTime time = LocalTime.now();
+		return time;
+	}
+
+	
+	public LocalTime formatearHora (int horaA, int minutoA, int segundoA) {
+		
+		
+		LocalTime sistema= hora();
+		int hora= sistema.getHour();
+		int minuto=sistema.getMinute();
+		int segundo= sistema.getSecond();
+		
+		 horaF = horaA - hora;
+		 minutoF = minutoA - minuto;
+		 segundoF = segundoA - segundo;
+		
+		 actualiza= sistema.plusHours(horaF).plusMinutes(minutoF).plusSeconds(segundoF);
+		
+		return actualiza;
+		
 	}
 	
-	public int getAnio() {
-		return anio;
-	}
-
-
-	public int getMes() {
-		return mes;
-	}
-
-
-	public int getDia() {
-		return dia;
-	}
-
-
-	public int getHora() {
-		return hora;
-	}
-
-
-	public int getMinuto() {
-		return minuto;
-	}
-
-
-	public int getSegundo() {
-		return segundo;
-	}
-
-
-	public String DateAndTIME(int anioA, int mesA, int diaA, int horaA, int minutoA, int segundoA) {
-
-		String time = formattedTime(horaA, minutoA, segundoA);
-		String date = formattedDate(anioA, mesA, diaA);
-
-		return date + "/////" + time;
-	}
-
-	public String dateActual(int anioA, int mesA, int diaA) {
-
+	public LocalDate formatearFecha(int anioA, int mesA, int diaA) {
+		
+		LocalDate sistema=fecha();
+		int anio= sistema.getYear();
+		int mes=sistema.getMonthValue();
+		int dia=sistema.getDayOfMonth();
+		
 		int anioF = anioA - anio;
 		int mesF = mesA - mes;
 		int diaF = diaA - dia;
-
-		return anioF + " " + mesF + " " + diaF;
+		
+		 actualizaFecha= sistema.plusYears(anioF).plusMonths(mesF).plusDays(diaF);
+		return actualizaFecha;
 	}
 
-	public String timeActual(int horaA, int minutoA, int segundoA) {
-
-		String result = darHora();
-		String[] array = result.split(" ");
-		for (int i = 0; i < array.length; i++) {
-			hora = Integer.parseInt(array[0]);
-			minuto = Integer.parseInt(array[1]);
-			segundo = Integer.parseInt(array[2]);
-		}
-		int horaF = horaA - hora;
-		int minutoF = minutoA - minuto;
-		int segundoF = segundoA - segundo;
-
-		return  horaF + " " + minutoF + " " + segundoF;
+	public LocalTime mantenerFecha() {
+	
+		LocalTime sistema= hora();
+		
+		 LocalTime total= sistema.plusHours(horaF).plusMinutes(minutoF).plusSeconds(segundoF);
+		
+		return total;
 	}
+	
+	
 
-	public String formattedDate(int anioA, int mesA, int diaA) {
 
-		int anioF = 0;
-		int mesF = 0;
-		int diaF = 0;
-		String result = dateActual(anioA, mesA, diaA);
-		String[] array = result.split(" ");
-		for (int i = 0; i < array.length; i++) {
-			anioF = Integer.parseInt(array[0]);
-			mesF = Integer.parseInt(array[1]);
-			diaF = Integer.parseInt(array[2]);
-		}
-		int anioS = anioF + anio;
-
-		int mesS = mesF + mes;
-
-		int diaS = diaF + dia;
-
-		return " fecha :" + anioS + "/" + mesS + "/" + diaS;
-	}
-
-	public String formattedTime(int horaA, int minutoA, int segundoA) {
-
-		int horaF = 0;
-		int minutoF = 0;
-		int segundoF = 0;
-		String result = timeActual(horaA, minutoA, segundoA);
-		String[] array = result.split(" ");
-		for (int i = 0; i < array.length; i++) {
-			horaF = Integer.parseInt(array[0]);
-			minutoF = Integer.parseInt(array[1]);
-			segundoF = Integer.parseInt(array[2]);
-		}
-		int horaS = horaF + hora;
-		int minutoS = minutoF + minuto;
-		int segundoS = segundoF + segundo;
-
-		return " hora : " + horaS + ":" + minutoS + ":" + segundoS;
-	}
-
+	
+	
+	
 }
