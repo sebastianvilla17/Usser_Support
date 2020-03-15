@@ -2,19 +2,18 @@ package model;
 
 import model.User;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 import model.DateAndTime;
 
-public class Shift {
+public class Shift implements Serializable {
 
 	private int idTurno;
 	private String turnoCodificado;
 	private char status;
 	private char coment;
 	private int posicionUser;
-	private double horaI;
-	private double horaF;
 	private ShiftType type;
 	private LocalTime startTime;
 	private LocalTime endTime;
@@ -29,8 +28,7 @@ public class Shift {
 		this.idTurno = turno;
 		this.turnoCodificado = convertirTurno(turno);
 		this.status = 'N';
-		this.coment = 'O';
-
+		this.coment = 'U';
 		this.type = new ShiftType(shiftName, startTime, endTime);
 
 	}
@@ -68,12 +66,8 @@ public class Shift {
 		return posicionUser;
 	}
 
-	public double getHoraI() {
-		return horaI;
-	}
-
-	public double getHoraF() {
-		return horaF;
+	public ShiftType getType() {
+		return type;
 	}
 
 	/**
@@ -145,7 +139,7 @@ public class Shift {
 	}
 
 	public String toString() {
-		return "codigo: " + turnoCodificado + " estaba el usuario: " + coment + "se atendio: " + status;
+		return "codigo: " + turnoCodificado + " estaba el usuario: " + coment + " se atendio: " + status;
 
 	}
 }

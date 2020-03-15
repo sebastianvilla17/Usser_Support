@@ -2,16 +2,20 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import customException.*;
 import model.DateAndTime;
 import model.ShiftType;
 
-public class ShiftSystem {
+public class ShiftSystem implements Serializable {
 
 	private String nameOfDepartament = "";
 	ArrayList<User> userList = new ArrayList<User>();
@@ -49,18 +53,20 @@ public class ShiftSystem {
 	 */
 	public String addUser(String documentType, String documentNumber, String name, String lastName, String phone,
 			String adress) {
-
+		long inicio = System.currentTimeMillis();
 		String info = "";
 
 		User usuario = new User(documentType, documentNumber, name, lastName, phone, adress);
 		userList.add(usuario);
 
 		info = (usuario.getName() + "  " + usuario.getLastName());
-		return info;
+		long fin = System.currentTimeMillis();
+		return info + "\n " + fin + " milliseconds";
+
 	}
 
 	public String addShift(String documentNumber, String shiftName, int horaFin, int minutoFin, int segundoFin) {
-
+		long inicio = System.currentTimeMillis();
 		int posicion = 0;
 		for (int i = 0; i < userList.size(); i++) {
 
@@ -79,7 +85,8 @@ public class ShiftSystem {
 		shiftList.add(turno);
 
 		String info = turno.getTurnoCodificado() + "  inicio " + start + "///" + "  fin " + end;
-		return info;
+		long fin = System.currentTimeMillis();
+		return info + "\n " + fin + " milliseconds";
 	}
 
 	public boolean discontinued(String document) {
@@ -115,6 +122,7 @@ public class ShiftSystem {
 	}
 
 	public String genrateUsers(int cant) throws IOException {
+		long inicio = System.currentTimeMillis();
 		String informe = "";
 		int conter = 0;
 		BufferedReader br = new BufferedReader(new FileReader(ARCHIVO_NOMBRE));
@@ -132,43 +140,47 @@ public class ShiftSystem {
 			conter++;
 
 		}
+		long fin = System.currentTimeMillis();
 		br.close();
 		bx.close();
 
-		return informe;
+		return informe + "\n" + fin + " milliseconds";
 	}
 
 	public String generateShifts(int day, int cant) {
-		String informe="";
-		String inforTotal="";
-		int conter=0;
-		String docNum="";
-		int num=0;
-		int dayge=1;
-		while(num<day) {
-			
-		while(conter<cant) {
-		int tamnio= userList.size();
-		int userPos =  (int)(Math.floor(Math.random() * (0 - tamnio + 1) + tamnio));
-		for(int i=0; i<userList.size(); i++) {
-			if(i==userPos) {
-				 docNum= userList.get(i).getDocumenNumber();
+
+		long inicio = System.currentTimeMillis();
+		String informe = "";
+		String inforTotal = "";
+		int conter = 0;
+		String docNum = "";
+		int num = 0;
+		int dayge = 1;
+		while (num < day) {
+
+			while (conter < cant) {
+				int tamnio = userList.size();
+				int userPos = (int) (Math.floor(Math.random() * (0 - tamnio + 1) + tamnio));
+				for (int i = 0; i < userList.size(); i++) {
+					if (i == userPos) {
+						docNum = userList.get(i).getDocumenNumber();
+					}
+				}
+
+				String shiftName = "sacar turno";
+				int horaFin = (int) (Math.floor(Math.random() * (1 - 24 + 1) + 24));
+				int minutoFin = (int) (Math.floor(Math.random() * (0 - 60 + 1) + 60));
+				int segundoFin = (int) (Math.floor(Math.random() * (0 - 60 + 1) + 60));
+
+				informe += addShift(docNum, shiftName, horaFin, minutoFin, segundoFin) + "\n";
+				conter++;
 			}
+			inforTotal += "Day: " + dayge + "\n" + "  " + informe + "\n";
+			num++;
+			dayge++;
 		}
-		
-		String shiftName= "sacar turno";
-		int horaFin=  (int)(Math.floor(Math.random() * (1 - 24 + 1) + 24));
-		int minutoFin =  (int)(Math.floor(Math.random() * (0 - 60 + 1) + 60));
-		int segundoFin=  (int)(Math.floor(Math.random() * (0 - 60 + 1) + 60));
-		
-		informe+= addShift( docNum,  shiftName,  horaFin,  minutoFin,  segundoFin) + "\n";
-		conter++;
-	}
-		inforTotal+="Day: "+ dayge +"\n"+ "  "+ informe+ "\n";
-		num++;
-		dayge++;
-		}
-		return inforTotal;
+		long fin = System.currentTimeMillis();
+		return inforTotal + "\n" + fin + " milliseconds";
 	}
 
 	/**
@@ -188,7 +200,6 @@ public class ShiftSystem {
 	 *         confirming that the user is not repeated
 	 */
 	public String repeated(String document) throws RepeatedUserException {
-
 		String message = "";
 
 		for (int i = 0; i < userList.size(); i++) {
@@ -223,7 +234,7 @@ public class ShiftSystem {
 
 	public String searchDocument(String documentNumber, String shiftName, int horaFin, int minutoFin, int segundoFin)
 			throws noFoundException {
-
+		long inicio = System.currentTimeMillis();
 		String encontrado = "";
 
 		for (int i = 0; i < userList.size(); i++) {
@@ -237,22 +248,8 @@ public class ShiftSystem {
 		if (encontrado.equals("")) {
 			throw new noFoundException(documentNumber);
 		}
-
-		return encontrado;
-
-		/*
-		 * String search = ""; for (int i = 0; i < userList.size(); i++) {
-		 * 
-		 * User usuarioTemporal = userList.get(i); if
-		 * (usuarioTemporal.getDocumenNumber().equals(documentNumber)) {
-		 * 
-		 * search = usuarioTemporal.toString() + " " + addShift(documentNumber,
-		 * shiftName, hora, minuto, segundo, horaFin, minutoFin, segundoFin); }
-		 * 
-		 * else {
-		 * 
-		 * throw new noFoundException(documentNumber); } } return search;
-		 */
+		long fin = System.currentTimeMillis();
+		return encontrado + "\n " + fin + " milliseconds";
 	}
 
 	/**
@@ -324,43 +321,29 @@ public class ShiftSystem {
 	 * @return This method returns a message with information about the attention of
 	 *         the shift
 	 */
-	public String attendShift(String document, char user) {
+	public String attendShift() {
+		long inicio = System.currentTimeMillis();
+		LocalTime start = fecha.mantenerFecha();
+		String report = "";
+		for (int i = 0; i < shiftList.size(); i++) {
 
-		String status = "";
-
-		for (int i = 0; i < userList.size(); i++) {
-
-			User usuarioTemporal = (User) userList.get(i);
-			if (usuarioTemporal.getDocumenNumber().equals(document)) {
-
-				for (int j = 1; j < shiftList.size(); j++) {
-
-					int tmp = shiftList.get(j).getPosicion();
-					if (tmp == i) {
-
-						if (user == 'N') {
-							shiftList.get(j).setStatus('A');
-							shiftList.get(j).setComent('O');
-
-							status = "the turn was attended but the user was not";
-						} else {
-							shiftList.get(j).setStatus('A');
-							status = "the turn was attended";
-						}
-					} else {
-						status = "This user does not have an assigned shift";
-					}
-				}
-			} else {
-				status = "This user does not registered";
+			Shift tmp = shiftList.get(i);
+			boolean isBefore = tmp.getType().getFin().isBefore(start);
+			if (isBefore == true) {
+				tmp.setStatus('A');
+				tmp.setComent('U');
+				report += "users served" + tmp.toString() + "\n";
 			}
-
 		}
-
-		return status;
+		if (report.equals("")) {
+			report = "not attended";
+		}
+		long fin = System.currentTimeMillis();
+		return report + "\n " + fin + " milliseconds";
 	}
 
-	public String report(String document) {
+	public String report(String document, int option) throws FileNotFoundException, IOException {
+		long inicio = System.currentTimeMillis();
 		String report = "";
 		for (int i = 0; i < userList.size(); i++) {
 			User usuarioTemporal = (User) userList.get(i);
@@ -370,10 +353,98 @@ public class ShiftSystem {
 						report += shiftList.get(j).toString() + "\n";
 					}
 				}
-				report = "no tiene turno";
-				break;
 			}
+
+		}
+		if (report.contentEquals("")) {
 			report = "no tiene turno";
+		}
+		if (option == 2) {
+			ObjectOutputStream out = new ObjectOutputStream(
+					new FileOutputStream("data" + File.separator + "reporte.txt"));
+			out.writeObject(report + " ");
+			out.close();
+		}
+		long fin = System.currentTimeMillis();
+		return report + "\n " + fin + " milliseconds";
+	}
+
+	public ArrayList<User> bubbleSort() {
+
+		@SuppressWarnings("unchecked")
+		ArrayList<User> clone = (ArrayList<User>) userList.clone();
+
+		int in;
+
+		for (int i = 1; i < clone.size(); i++) {
+			User aux = clone.get(i);
+			in = i;
+			while (in > 0 && clone.get(in - 1).getDocumenNumber().compareTo(aux.getDocumenNumber()) > 0) {
+				User uno = clone.get(in);
+				uno = clone.get(in - 1);
+				in--;
+			}
+			User dos = clone.get(in);
+			dos = aux;
+		}
+		return clone;
+	}
+
+	public ArrayList<User> seletionSort() {
+		ArrayList<User> rs = (ArrayList<User>) userList.clone();
+
+		for (int i = 0; i < rs.size(); i++) {
+
+			User menor = rs.get(i);
+			int cual = i;
+
+			for (int j = i + 1; j < rs.size(); j++) {
+				if (rs.get(j).getName().compareTo(menor.getName()) < 0) {
+					menor = rs.get(j);
+					cual = j;
+				}
+			}
+
+			User tmp = rs.get(i);
+			rs.set(i, menor);
+			rs.set(cual, tmp);
+		}
+
+		return rs;
+	}
+
+	public ArrayList<User> insertionSort() {
+		ArrayList<User> clonado = (ArrayList<User>) userList.clone();
+
+		int p, j;
+		User aux;
+		for (p = 1; p < clonado.size(); p++) { 
+			aux =clonado.get(p); 
+			j = p - 1; 
+			while ((j >= 0) && (aux.getLastName().compareTo(clonado.get(j).getLastName())<0)) { 
+												
+				clonado.set(j+1, clonado.get(j)); 
+				j--; 
+			}
+			clonado.set(j+1, aux); 
+		}
+		return clonado;
+	}
+
+	public String reporteOrdenadoDocumento(String tipoOrdenamiento) {
+		String report = "";
+		ArrayList<User> usuariosOrdenados = null;
+		if (tipoOrdenamiento.equals("Documento")) {
+			usuariosOrdenados = bubbleSort();
+		} else if (tipoOrdenamiento.equals("Nombre")) {
+			usuariosOrdenados = seletionSort(); // 
+		} else if (tipoOrdenamiento.equals("Apellido")) {
+			usuariosOrdenados = insertionSort(); // 
+		}
+
+		// Imprime el arreglo
+		for (int i = 0; i < usuariosOrdenados.size(); i++) {
+			report += usuariosOrdenados.get(i).toString() + "\n";
 		}
 
 		return report;

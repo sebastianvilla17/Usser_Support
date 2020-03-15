@@ -1,6 +1,8 @@
 package model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable{
 	private String documentType = "";
 	private String documentNumber = "";
 	private String name = "";
@@ -23,6 +25,18 @@ public class User {
 
 	public boolean isDiscontinued() {
 		return discontinued;
+	}
+	
+	public int compareTo ( User ot) {
+		int comparation;
+		if(documentNumber.compareTo(ot.documentNumber)<0) {
+			comparation = -1;
+		}else if(documentNumber.compareTo(ot.documentNumber)>0) {
+			comparation = 1;
+		}else {
+			comparation = 0;
+		}
+		return comparation;
 	}
 
 	public void setDiscontinued(boolean discontinued) {
@@ -127,7 +141,7 @@ public class User {
 	 * @return The emtodo returns a String with the information concatenated
 	 */
 	public String toString() {
-		return "Name : " + name + " " + lastName + "//" + "Phone: " + phone;
+		return "Document: "+ documentNumber+ "// "+ "Name : " + name + " " + lastName + "//" + "Phone: " + phone  ;
 	}
 
 }

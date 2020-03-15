@@ -1,11 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Calendar;
 
-public class DateAndTime {
+
+public class DateAndTime implements Serializable{
 
 	public static DateAndTime dateAndTimeUnico = new DateAndTime();
 	private LocalDate actualizaFecha;

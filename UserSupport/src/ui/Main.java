@@ -1,6 +1,12 @@
 package ui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Scanner;
@@ -26,10 +32,19 @@ public class Main {
 	 * options menu and according to the option chosen to ask the necessary
 	 * requirements. at the same time, it makes the necessary validations and
 	 * according to this it throws an error or takes it to the corresponding method
+	 * 
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws ClassNotFoundException
 	 *
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 
+		
+		ObjectInputStream entrada = new ObjectInputStream(new FileInputStream("data" + File.separator + "guardar.txt")); 
+		 ShiftSystem obj1 = (ShiftSystem)entrada.readObject(); 
+		 entrada.close();
+		 
 		int anioA;
 		int mesA;
 		int diaA = 0;
@@ -62,25 +77,6 @@ public class Main {
 		date = DateAndTime.ObtenerDateAndTimeUnico();
 		init();
 
-			System.out.println("ingrese la cantidad");
-			int cantidad=Integer.parseInt(reader.nextLine());
-			
-			try {
-			String result= users.genrateUsers(cantidad);
-			System.out.println(result);
-			}catch(IOException x) {
-				
-			}
-			
-			System.out.println("ingrese la cantidad");
-			int turn=Integer.parseInt(reader.nextLine());
-			
-			System.out.println("ingrese los dias");
-			int day=Integer.parseInt(reader.nextLine());
-			
-			String total= users.generateShifts(day, turn);
-			System.out.println(total);
-			
 		do {
 			System.out.println("choose the desired option\n" + "1 format the time\n" + "2 handle the system");
 			try {
@@ -135,7 +131,7 @@ public class Main {
 				System.out.println("Welcome to the shifts attention system for the user");
 				System.out.println("///////////////////////////////////////////////////");
 				System.out.println("1 register shift or\n" + "2 attend shift\n" + "3 reports \n"
-						+ "4 show date and time\n" + "5 suspend user");
+						+ "4 show date and time\n" + "5 suspend user\n" + "6 random generation\n"+ "7 Sort by document Number \n" + "8 Sort by name\n"+ "9 Sort by last Name");
 				option = Integer.parseInt(reader.nextLine());
 
 			} catch (NumberFormatException x) {
@@ -277,27 +273,29 @@ public class Main {
 				break;
 
 			case 2:
-				/*
-				 * System.out.println("enter the patient's document number"); find =
-				 * reader.nextLine().toLowerCase(); try { info = users.searchDocument(find); }
-				 * catch (noFoundException s) { info = s.getMessage(); System.out.println(info);
-				 * } System.out.println(info); System.out.println("///////////////");
-				 * System.out.println("is the user?\n" + "yes, enter 'Y'\n" + "no enter 'N'");
-				 * answer = reader.nextLine().toUpperCase().charAt(0); creation =
-				 * users.attendShift(find, answer); System.out.println(creation); break;
-				 */
+
+				creation = users.attendShift();
+				System.out.println(creation);
 				break;
 
 			case 3:
-
+				System.out.println("1 user report \n" + "2 shift report");
+				option = Integer.parseInt(reader.nextLine());
+				if(option==1) {
 				System.out.println("enter the document Number of the user");
 				documentNumber = reader.nextLine().toLowerCase();
+				System.out.println("1 see it on screen \n" + "2 save it to file");
+				netx = Integer.parseInt(reader.nextLine());
 				if (users.discontinued(documentNumber) == true) {
 					System.out.println("suspended user");
-				} 
-				else {
-					info = users.report(documentNumber);
+				} else {
+					info = users.report(documentNumber,netx);
 					System.out.println(info);
+				}
+				}else if(option==2) {
+					
+				}else {
+					System.out.println("wrong choice");
 				}
 				break;
 
@@ -309,17 +307,60 @@ public class Main {
 			case 5:
 				System.out.println("enter the document number of the person you want to suspend");
 				documentNumber = reader.nextLine().toLowerCase();
-			     if( users.discontinued(documentNumber)==true) {
-			    	 System.out.println("suspended user");
-			     }else {
-				System.out.println("the user is not suspended");
-			     }
+				if (users.discontinued(documentNumber) == true) {
+					System.out.println("suspended user");
+				} else {
+					System.out.println("the user is not suspended");
+				}
+				break;
+
+			case 6:
+				System.out.println("1 generate users \n" + "2 generate shifts");
+				option = Integer.parseInt(reader.nextLine());
+				if (option == 1) {
+
+					System.out.println("enter the number of users that is to generate no more than 1000");
+					int cantidad = Integer.parseInt(reader.nextLine());
+
+					try {
+						String result = users.genrateUsers(cantidad);
+						System.out.println(result);
+					} catch (IOException x) {
+
+					}
+				} else if (option == 2) {
+
+					System.out.println("how many shift days do you want to generate");
+					int day = Integer.parseInt(reader.nextLine());
+
+					System.out.println("how many shifts per day");
+					int turn = Integer.parseInt(reader.nextLine());
+
+					String total = users.generateShifts(day, turn);
+					System.out.println(total);
+				}
+				break;
+			case 7:
+				
+				System.out.println(users.reporteOrdenadoDocumento("Documento"));
+				break;
+				
+			case 8:
+				System.out.println(users.reporteOrdenadoDocumento("Nombre"));
+				break;
+				
+			case 9: 
+				System.out.println(users.reporteOrdenadoDocumento("Apellido"));
 				break;
 			}
-
+			ObjectOutputStream salida = new ObjectOutputStream(
+					new FileOutputStream("data" + File.separator + "guardar.txt"));
+			salida.writeObject(users);
+			salida.close();
 			System.out.println("you want to return to the menu \n" + "1 yes\n" + "2 no");
 			netx = Integer.parseInt(reader.nextLine());
 		} while (netx == 1);
+
 	}
 
 	/**
@@ -341,6 +382,14 @@ public class Main {
 
 		users.addUser(documentType, documentNumber, name, lastName, phone, adress);
 
+		 name = "hector";
+		 lastName = "cruz";
+		 documentType = "cedula";
+		 documentNumber = "66824321";
+		 phone = "3023558556";
+		 adress = "cra 5 #25-14";
+
+		users.addUser(documentType, documentNumber, name, lastName, phone, adress);
 	}
 
 }

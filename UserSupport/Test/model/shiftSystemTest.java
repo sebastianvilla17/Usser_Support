@@ -16,9 +16,14 @@ class shiftSystemTest {
 	private void setup1() {
 		
 		tmp.addUser("cedula","66850347","marina","avila","3207650367","la sirena") ;
-		
+		tmp.addShift("66850347", "sacar cita", 7, 10, 0);
 	}
-	;
+	
+	private void setup2() {
+		prueba.addUser("cedula", "66824321", "gladys", "avila", "3184415441", "cra51 #34");
+		prueba.addShift("66824321", "pedir almuerzo", 11, 14, 21);
+	}
+	
 	@Test
 	public void addUserTest() {
 		
@@ -50,13 +55,12 @@ class shiftSystemTest {
 			}
 	}
 		
-	@Test
 		public void searchDocumet () {
 			
 			User user= new User("cedula","66850347","marina","avila","3207650367","la sirena");
 			setup1();
 			try {
-			assertEquals( tmp.searchDocument(user.getDocumenNumber(),"cancelar cita", 12,24,15),"Name : marina avila//Phone: 3207650367 A00  inicio 14:40:34.485///  fin 12:24:15.485","this correct");
+			assertEquals( tmp.searchDocument(user.getDocumenNumber(),"cancelar cita", 12,24,15),"Name : marina avila//Phone: 3207650367 A01  inicio 07:10:00.779///  fin 12:24:15.779","this correct");
 			}
 			catch(noFoundException s) {
 				
@@ -103,17 +107,17 @@ class shiftSystemTest {
 	
 		@Test
 		public void discontinued() {
-			assertEquals( tmp.discontinued("1193269834"),"the user is not penalized","this correct");
+			assertFalse(tmp.discontinued("1193269834"), "false");
 		}
 		
-		
+		@Test
 		public void attendShiftTest () {
 			
 			
 			setup1();
-			assertEquals( tmp.attendShift("1193269834", 'Y'),"This user does not have an assigned shift or is not registered","this correct");
-			assertEquals( tmp.attendShift("66850347", 'Y'),"the turn was attended","this correct");
-			assertEquals( tmp.attendShift("66850347", 'N'),"the turn was attended but the user was not","this correct");
+			assertEquals( tmp.attendShift(),"not attended","this correct");
+			assertEquals( prueba.attendShift(),"not attended");
+			
 		}
 
 }
